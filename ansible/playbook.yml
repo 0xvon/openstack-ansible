@@ -1,0 +1,35 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: stop firewalld
+      systemd:
+        name: firewalld.service
+        state: stopped
+        enabled: no
+    - name: stop NetworkManager
+      systemd:
+        name: NetworkManager
+        state: stopped
+        enabled: no
+    - name: start network
+      systemd:
+        name: network
+        state: started
+        enabled: yes
+
+    - name: install packstack repository
+      yum:
+        name: centos-release-openstack-train
+        state: latest
+
+    - name: install packstack
+      yum:
+        name: openstack-packstack
+        state: latest
+
+    - name: generate answer file
+      shell: packstack --gen-answer-file=~/answer.cfg
+
+    - name: install packstack
+      shell: packstack --answer-file=~/answer.cfg
